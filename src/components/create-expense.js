@@ -6,10 +6,11 @@ import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import { FormControl, FormGroup, InputLabel, Input, Button, TextField, } from '@mui/material';
-import { useState } from 'react';
-// import DatePicker from 'react-datepicker'; 
+import { useState, useLayoutEffect } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
+
 
 export default function CreateExpense () {
     
@@ -31,6 +32,20 @@ export default function CreateExpense () {
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState(null);
 
+    useLayoutEffect(()=>
+      {
+        axios.get('http://localhost:5000/category/')
+        .then(resp => {
+          if (resp.data.length > 0 ){
+            setCategories(resp.data.map(categories=>categories.category));
+            setCategory(categories[0]);
+            console.log(categories);
+            console.log(category);
+          }
+        })
+        .catch(err => err)
+      },[]
+    );
 
     return(
     <>
@@ -53,7 +68,13 @@ export default function CreateExpense () {
                 </FormControl>
                 <FormControl sx={{marginTop:2}}>
                     <InputLabel sx={{padding:1}}>Category</InputLabel>
-                    <Input onChange={ (e)=>setCategory(e.target.value)}/>
+                    <select value={category} onChange={ (e)=>setCategory(e.target.value)}>
+                      { 
+                      categories.map((category)=>{
+                        return <option key={category} value={category}> {category} </option>
+                      })
+                      }
+                    </select>
                 </FormControl>
                 <FormControl sx={{marginTop:2}}>
                     <InputLabel sx={{padding:1}}>Currency</InputLabel>
